@@ -35,7 +35,7 @@ class Transcode(object):
         self.path = path
 
     @classmethod
-    def ___run_process(command):
+    def ___run_process(self, command):
         process = subprocess.Popen(command, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT,
                                    encoding='utf-8')
