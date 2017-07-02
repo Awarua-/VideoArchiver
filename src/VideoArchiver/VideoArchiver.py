@@ -10,9 +10,9 @@ NVENC_CHECK_STRING = "supports NVENC"
 
 @click.command()
 @click.argument('input', type=click.File('rb'))
-def read(input):
-    click.echo('transcoding file: {}'.format(input.name))
-    session = Transcode(input.name)
+def read(input_path):
+    click.echo('transcoding file: {}'.format(input_path.name))
+    session = Transcode(input_path.name)
     session.run()
 
 
@@ -34,7 +34,8 @@ class Transcode(object):
     def set_path(self, path):
         self.path = path
 
-    def ___run_process(self, command):
+    @classmethod
+    def ___run_process(command):
         process = subprocess.Popen(command, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT,
                                    encoding='utf-8')
@@ -98,8 +99,8 @@ class Transcode(object):
     def __transcode_software(self):
         command = "ffmpeg -c:v h264 -i".split(' ')
         command.append(os.path.realpath(self.path))
-        next = "-map 0 -c copy -c:v libx265 -preset medium -crf 28"
-        command += next.split(' ')
+        next_command = "-map 0 -c copy -c:v libx265 -preset medium -crf 28"
+        command += next_command.split(' ')
         command.append(os.path.realpath(self.tfile.name))
         command.append("-y")
 
@@ -123,4 +124,4 @@ class Transcode(object):
         self.tfile.name += '.mkv'
 
 if __name__ == "__main__":
-    file = read()
+    read()
