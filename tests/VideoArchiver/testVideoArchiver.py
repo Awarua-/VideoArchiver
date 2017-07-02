@@ -1,4 +1,6 @@
-import os, pytest, shutil
+import os
+import pytest
+import shutil
 from src.VideoArchiver import VideoArchiver
 
 
@@ -7,6 +9,7 @@ test_data = [("../data/hc.mp4", -1), ("../data/c.mp4", 0),
              ("../data", -1), ("../data/junk.txt", -1)]
 test_transcode_data = [("../data/c.mp4", "../data/test.mp4", 0),
                        ("../data/hc.mp4", "../data/test.mp4", -1)]
+
 
 class TestVideoArchiver(object):
 
@@ -27,7 +30,7 @@ class TestVideoArchiver(object):
     @pytest.mark.parametrize("path,out,expected", test_transcode_data)
     def test___transcode(self, path, out, expected):
         self.archiver.path = os.path.join(dir_path, path)
-        self.archiver.tfile = type('mock', (object,), {"name":
-                               os.path.join(dir_path, out)})
+        self.archiver.tfile = type('mock', (object,),
+                                   {"name": os.path.join(dir_path, out)})
         result = self.archiver._Transcode__transcode()
         assert result == expected
