@@ -31,12 +31,3 @@ class TestVideoArchiver(object):
                                os.path.join(dir_path, out)})
         result = self.archiver._Transcode__transcode()
         assert result == expected
-
-    def test___move_file(self):
-        pass
-
-    def test___open_temp_file(self):
-        pass
-
-    def test___close_temp_file(self):
-        pass
