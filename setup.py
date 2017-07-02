@@ -11,4 +11,6 @@ setup(
         [console_scripts]
         VideoArchiver=VideoArchiver:read
         ''',
+    setup_requires=['pytest-runner'],
+    test_requires=['pytest']
 )
