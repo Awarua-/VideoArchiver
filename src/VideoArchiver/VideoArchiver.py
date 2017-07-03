@@ -1,3 +1,9 @@
+"""Transcoding h264 -> h265.
+
+This module transcodes a single file from h264 to h265 using ffmpeg
+and hardware acceleration where supported
+"""
+
 import click
 import os
 import shutil
@@ -11,19 +17,34 @@ NVENC_CHECK_STRING = "supports NVENC"
 @click.command()
 @click.argument('input', type=click.File('rb'))
 def read(input_path):
+    """Transcodes the file in the given path.
+
+    Args:
+        input_path (str): path to file
+    """
     click.echo('transcoding file: {}'.format(input_path.name))
     session = Transcode(input_path.name)
     session.run()
 
 
 class Transcode(object):
+    """The transcode instance.
+
+    Args:
+        path (str): path of file to transcode
+
+    Atributes:
+        path (str): path of file to transcode
+        tfile (object): tempory file object
+        hardware_support (int): indicates hardware support for transcoding
+    """
 
     def __init__(self, path='./placeholder'):
-        """This initialises the Transcode session."""
         self.path = path
         self.hardware_support = self.__check_hardware_suppport()
 
     def run(self):
+        """Runs the transcoding process."""
         if self.__check_if_file_valid() == 0:
             self.__create_temp_file()
             if self.__transcode() == 0:
@@ -32,6 +53,10 @@ class Transcode(object):
             self.__close_temp_file()
 
     def set_path(self, path):
+        """Sets the path for the file to be transcoded.
+
+        :param path: Sets path of file to transcode
+        """
         self.path = path
 
     @classmethod
