@@ -7,7 +7,7 @@ from src.VideoArchiver import VideoArchiver
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 test_data = [("../data/hc.mp4", -1), ("../data/c.mp4", 0),
-             ("../data", -1), ("../data/junk.txt", -1)]
+             ("../data", -1), ("../data/junk.txt", -1), ("../data/more_data/c.mp4", -1)]
 test_transcode_data = [("../data/c.mp4", "../data/test.mp4", 0),
                        ("../data/hc.mp4", "../data/test.mp4", -1)]
 
@@ -39,5 +39,5 @@ class TestVideoArchiver(object):
     def test_directory(self):
         path = os.path.abspath(os.path.join(dir_path, "../temp_data"))
         distutils.dir_util.copy_tree(os.path.join(dir_path, "../data"), path)
-        VideoArchiver.transcode_files(path)
+        VideoArchiver.transcode_files(path, 30)
         shutil.rmtree(path)
