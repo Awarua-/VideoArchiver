@@ -1,0 +1,16 @@
+language: python
+dist: trusty
+sudo: required
+
+python:
+    - 3.6
+
+before_install:
+    - sudo add-apt-repository -y ppa:mc3man/trusty-media
+    - sudo apt-get update
+    - sudo apt-get install ffmpeg
+
+install:
+    - pip install .
+
+script: python setup.py test
