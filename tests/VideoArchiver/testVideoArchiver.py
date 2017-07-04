@@ -1,3 +1,4 @@
+import distutils
 import os
 import pytest
 import shutil
@@ -34,3 +35,9 @@ class TestVideoArchiver(object):
                                    {"name": os.path.join(dir_path, out)})
         result = self.archiver._Transcode__transcode()
         assert result == expected
+
+    def test_directory(self):
+        path = os.path.abspath(os.path.join(dir_path, "../temp_data"))
+        distutils.dir_util.copy_tree(os.path.join(dir_path, "../data"), path)
+        VideoArchiver.transcode_files(path)
+        shutil.rmtree(path)
