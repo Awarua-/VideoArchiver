@@ -12,7 +12,8 @@ import tempfile
 import time
 
 H264_CHECK_STRING = "h264"
-NVENC_CHECK_STRING = "supports NVENC"
+# Warning NVENC check string appears to be unstable between versions of ffmpeg
+NVENC_CHECK_STRING = "GPU #0"
 
 
 def transcode_files(path, age):
@@ -152,15 +153,17 @@ class Transcode(object):
         return 0
 
     def __check_hardware_suppport(self):
-        command = "ffmpeg -f lavfi -i nullsrc -c:v nvenc -gpu list -f null -"
+        command = "ffmpeg -f lavfi -i nullsrc -c:v h264_nvenc -gpu list -f null -"
         command = command.split(' ')
 
         out, rc = self.___run_process(command)
 
+        print(out)
+
         if NVENC_CHECK_STRING not in out:
             return -1
-
-        return rc
+        else:
+            return 0
 
     def __transcode_software(self):
         command = "ffmpeg -c:v h264 -i".split(' ')
