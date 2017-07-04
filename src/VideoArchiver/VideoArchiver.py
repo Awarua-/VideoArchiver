@@ -9,20 +9,20 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 
 H264_CHECK_STRING = "h264"
 NVENC_CHECK_STRING = "supports NVENC"
 
 
-def transcode_files(path):
+def transcode_files(path, age):
     """Transcodes the fileS in the given path.
 
     Args:
         input_path (str): path to fileS
     """
-
     session = Transcode()
-
+    session.set_age(age)
     if os.path.isdir(path):
         for root, dirs, files in os.walk(path):
             for file in files:
@@ -40,8 +40,10 @@ def transcode_files(path):
 
 @click.command()
 @click.argument('input_path', type=click.Path())
-def read(input_path):
-    transcode_files(input_path)
+@click.option('--age', default=30)
+def read(input_path, age):
+    """Read command input function."""
+    transcode_files(input_path, age)
 
 
 class Transcode(object):
@@ -49,6 +51,7 @@ class Transcode(object):
 
     Args:
         path (str): path of file to transcode
+        age (int): number of days old the file needs to be before being transcoded.
 
     Atributes:
         path (str): path of file to transcode
@@ -56,8 +59,9 @@ class Transcode(object):
         hardware_support (int): indicates hardware support for transcoding
     """
 
-    def __init__(self, path='./placeholder'):
+    def __init__(self, path='./placeholder', age=30):
         self.path = path
+        self.age = age
         self.hardware_support = self.__check_hardware_suppport()
 
     def run(self):
@@ -75,6 +79,13 @@ class Transcode(object):
         :param path: Sets path of file to transcode
         """
         self.path = path
+
+    def set_age(self, age):
+        """Threshold for age of file.
+
+        :param age: Age of file threshold
+        """
+        self.age = age
 
     @classmethod
     def ___run_process(self, command):
@@ -111,7 +122,20 @@ class Transcode(object):
             click.echo("File was not encoded with {}, but instead was {}"
                        .format(H264_CHECK_STRING, out))
             return -1
+
+        if self.__check_if_file_is_old():
+            click.echo("File was still recent, not transcoding")
+            return -1
+
         return rc
+
+    def __check_if_file_is_old(self):
+        file_time = os.path.getmtime(self.path)
+        now = time.time()
+        threshold = self.age * 24 * 60 * 60
+        if now - file_time < threshold:
+            return 1
+        return 0
 
     def __transcode_hardware(self):
         command = "ffmpeg -c:v h264_cuvid -i".split(' ')
