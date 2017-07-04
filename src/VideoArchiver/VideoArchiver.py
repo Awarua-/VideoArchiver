@@ -12,6 +12,7 @@ import tempfile
 import time
 
 H264_CHECK_STRING = "h264"
+MPEG4_CHECK_STRING = "mpeg4"
 # Warning NVENC check string appears to be unstable between versions of ffmpeg
 NVENC_CHECK_STRING = "GPU #0"
 
@@ -119,7 +120,11 @@ class Transcode(object):
 
         out, rc = self.___run_process(command)
 
-        if H264_CHECK_STRING not in out:
+        if H264_CHECK_STRING in out:
+            self.codec = H264_CHECK_STRING
+        elif MPEG4_CHECK_STRING in out:
+            self.code = MPEG4_CHECK_STRING
+        else:
             click.echo("File was not encoded with {}, but instead was {}"
                        .format(H264_CHECK_STRING, out))
             return -1
@@ -139,7 +144,10 @@ class Transcode(object):
         return 0
 
     def __transcode_hardware(self):
-        command = "ffmpeg -c:v h264_cuvid -i".split(' ')
+        command = "ffmpeg -c:v".split(' ')
+        codec = self.codec + "_cuvid"
+        command.append(codec)
+        command.append("-i")
         command.append(os.path.realpath(self.path))
         command += "-map 0 -c copy -c:v hevc_nvenc -preset slow".split(' ')
         command.append(os.path.realpath(self.tfile.name))
