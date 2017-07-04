@@ -14,17 +14,34 @@ H264_CHECK_STRING = "h264"
 NVENC_CHECK_STRING = "supports NVENC"
 
 
-@click.command()
-@click.argument('input', type=click.File('rb'))
-def read(input_path):
-    """Transcodes the file in the given path.
+def transcode_files(path):
+    """Transcodes the fileS in the given path.
 
     Args:
-        input_path (str): path to file
+        input_path (str): path to fileS
     """
-    click.echo('transcoding file: {}'.format(input_path.name))
-    session = Transcode(input_path.name)
-    session.run()
+
+    session = Transcode()
+
+    if os.path.isdir(path):
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                path = os.path.join(root, file)
+                click.echo('transcoding file: {}'.format(path))
+                session.set_path(path)
+                session.run()
+    elif os.path.isfile(path):
+        click.echo('transcoding file: {}'.format(path))
+        session.set_path(path)
+        session.run()
+    else:
+        click.echo('input not recognised')
+
+
+@click.command()
+@click.argument('input_path', type=click.Path())
+def read(input_path):
+    transcode_files(input_path)
 
 
 class Transcode(object):
