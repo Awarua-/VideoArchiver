@@ -192,7 +192,9 @@ class Transcode(object):
                         os.path.realpath(self.path))
 
     def __close_temp_file(self):
+        file_path = self.tfile.name
         self.tfile.close()
+        os.remove(file_path)
 
     def __create_temp_file(self):
         self.tfile = tempfile.NamedTemporaryFile(mode='w')
