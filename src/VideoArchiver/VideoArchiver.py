@@ -48,7 +48,7 @@ def transcode_files(path, age=30, reverse=False):
 @click.command()
 @click.argument('input_path', type=click.Path())
 @click.option('--age', default=30)
-@click.option('--reverse', default=False)
+@click.option('--reverse', is_flag=True)
 def read(input_path, age, reverse):
     """Read command input function."""
     transcode_files(input_path, age)
