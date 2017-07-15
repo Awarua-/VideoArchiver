@@ -17,7 +17,7 @@ MPEG4_CHECK_STRING = "mpeg4"
 NVENC_CHECK_STRING = "GPU #0"
 
 
-def transcode_files(path, age):
+def transcode_files(path, age, reverse):
     """Transcodes the fileS in the given path.
 
     Args:
@@ -26,12 +26,17 @@ def transcode_files(path, age):
     session = Transcode()
     session.set_age(age)
     if os.path.isdir(path):
+        files_t = []
         for root, dirs, files in os.walk(path):
             for file in files:
                 path = os.path.join(root, file)
-                click.echo('transcoding file: {}'.format(path))
-                session.set_path(path)
-                session.run()
+                files_t.append(path)
+        if reverse:
+            files_t.reverse()
+        for path in files_t:
+            click.echo('transcoding file: {}'.format(path))
+            session.set_path(path)
+            session.run()
     elif os.path.isfile(path):
         click.echo('transcoding file: {}'.format(path))
         session.set_path(path)
@@ -43,7 +48,8 @@ def transcode_files(path, age):
 @click.command()
 @click.argument('input_path', type=click.Path())
 @click.option('--age', default=30)
-def read(input_path, age):
+@click.option('--reverse', default=False)
+def read(input_path, age, reverse):
     """Read command input function."""
     transcode_files(input_path, age)
 
@@ -144,12 +150,12 @@ class Transcode(object):
         return 0
 
     def __transcode_hardware(self):
-        command = "ffmpeg -c:v".split(' ')
+        command = "ffmpeg -hwaccel cuvid -c:v".split(' ')
         codec = self.codec + "_cuvid"
         command.append(codec)
         command.append("-i")
         command.append(os.path.realpath(self.path))
-        command += "-map 0 -c copy -c:v hevc_nvenc -preset slow".split(' ')
+        command += "-max_muxing_queue_size 9999 -map 0 -c copy -c:v hevc_nvenc -preset slow".split(' ')
         command.append(os.path.realpath(self.tfile.name))
         command.append("-y")
         out, rc = self.___run_process(command)
