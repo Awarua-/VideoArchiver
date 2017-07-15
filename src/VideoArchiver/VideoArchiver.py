@@ -17,7 +17,7 @@ MPEG4_CHECK_STRING = "mpeg4"
 NVENC_CHECK_STRING = "GPU #0"
 
 
-def transcode_files(path, age, reverse):
+def transcode_files(path, age=30, reverse=False):
     """Transcodes the fileS in the given path.
 
     Args:
@@ -71,6 +71,7 @@ class Transcode(object):
         self.path = path
         self.age = age
         self.hardware_support = self.__check_hardware_suppport()
+        self.codec = H264_CHECK_STRING
 
     def run(self):
         """Runs the transcoding process."""
