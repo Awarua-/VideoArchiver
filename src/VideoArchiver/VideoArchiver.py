@@ -102,14 +102,18 @@ class Transcode(object):
                                    stderr=subprocess.STDOUT,
                                    encoding='utf-8')
         out = ""
-        while True:
-            output = process.stdout.readline()
-            if output == '' and process.poll() is not None:
-                break
-            if output:
-                out += output
-        rc = process.poll()
-
+        rc = -1
+        try:
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    out += output
+            rc = process.poll()
+        except Exception as error:
+            click.echo("Unexcepted error occurred:" + error.message)
+            rc = -1
         return out, rc
 
     def __transcode(self):
