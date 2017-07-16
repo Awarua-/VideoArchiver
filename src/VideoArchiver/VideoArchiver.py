@@ -111,8 +111,8 @@ class Transcode(object):
                 if output:
                     out += output
             rc = process.poll()
-        except Exception as error:
-            click.echo("Unexcepted error occurred:" + error.message)
+        except Exception:
+            click.echo("Unexcepted error occurred")
             rc = -1
         return out, rc
 
